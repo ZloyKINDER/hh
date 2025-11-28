@@ -1,6 +1,7 @@
 import os
 from typing import Dict
 
+
 def get_db_params() -> Dict[str, str]:
     """Конфиг подключения к бд."""
     return {

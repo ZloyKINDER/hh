@@ -1,5 +1,6 @@
 import psycopg2
 from psycopg2 import sql
+
 from .config import get_db_params
 
 
@@ -13,13 +14,11 @@ class DatabaseManager:
             dbname="postgres",
             user=get_db_params()["user"],
             password=get_db_params()["password"],
-            host=get_db_params()["host"]
+            host=get_db_params()["host"],
         )
         conn.autocommit = True
         cur = conn.cursor()
-        cur.execute(sql.SQL("CREATE DATABASE {}").format(
-            sql.Identifier(get_db_params()["dbname"])
-        ))
+        cur.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(get_db_params()["dbname"])))
         cur.close()
         conn.close()
         print(f"База данных {get_db_params()['dbname']} создана.")
@@ -31,7 +30,8 @@ class DatabaseManager:
         cur = conn.cursor()
 
         # Таблица работодателей
-        cur.execute("""
+        cur.execute(
+            """
             CREATE TABLE IF NOT EXISTS employers (
                 employer_id SERIAL PRIMARY KEY,
                 hh_id VARCHAR(50) UNIQUE NOT NULL,
@@ -39,10 +39,12 @@ class DatabaseManager:
                 url TEXT,
                 open_vacancies INTEGER DEFAULT 0
             );
-        """)
+        """
+        )
 
         # Таблица вакансий
-        cur.execute("""
+        cur.execute(
+            """
             CREATE TABLE IF NOT EXISTS vacancies (
                 vacancy_id SERIAL PRIMARY KEY,
                 hh_id VARCHAR(50) UNIQUE NOT NULL,
@@ -53,7 +55,8 @@ class DatabaseManager:
                 employer_id INTEGER REFERENCES employers(employer_id) ON DELETE CASCADE,
                 description TEXT
             );
-        """)
+        """
+        )
 
         conn.commit()
         cur.close()
