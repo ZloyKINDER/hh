@@ -1,14 +1,18 @@
-import psycopg2
 from typing import List
+
+import psycopg2
+
 from ..api.hh_api import HeadHunter
 from ..vacancy.vacancy import Vacancy
 from .config import get_db_params
+
 
 class DataLoader:
     def __init__(self):
         self.api = HeadHunter()
 
     def load_employers(self, employer_ids: List[str]):
+        """Загружает работодателей"""
         conn = psycopg2.connect(**get_db_params())
         cur = conn.cursor()
 
@@ -28,8 +32,8 @@ class DataLoader:
                         employer["id"],
                         employer["name"],
                         employer.get("alternate_url"),
-                        employer.get("open_vacancies", 0)
-                    )
+                        employer.get("open_vacancies", 0),
+                    ),
                 )
             except Exception as e:
                 print(f"Ошибка во время загрузки компании {hh_id}: {e}")
@@ -40,6 +44,7 @@ class DataLoader:
         print("Компании загружены.")
 
     def load_vacancies(self, employer_ids: List[str]):
+        """Загружает вакансии"""
         conn = psycopg2.connect(**get_db_params())
         cur = conn.cursor()
 
@@ -63,8 +68,8 @@ class DataLoader:
                             salary.get("from"),
                             salary.get("to"),
                             hh_id,
-                            (vac.get("snippet") or {}).get("responsibility", "") or ""
-                        )
+                            (vac.get("snippet") or {}).get("responsibility", "") or "",
+                        ),
                     )
             except Exception as e:
                 print(f"Ошибка во время загрузки вакансий для {hh_id}: {e}")
